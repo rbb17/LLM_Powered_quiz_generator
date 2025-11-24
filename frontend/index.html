@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF → MCQ Agent</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>PDF → MCQ Agent</h1>
+      <p class="subtitle">Upload a PDF, get MCQs, answer with hints/explanations.</p>
+    </header>
+
+    <section class="card">
+      <form id="upload-form">
+        <label class="label">PDF file</label>
+        <div class="file-picker">
+          <label for="pdf-file" class="file-label">
+            <span class="icon">📄</span>
+            <span>Select PDF</span>
+          </label>
+          <input id="pdf-file" type="file" accept="application/pdf" required />
+          <span id="file-name" class="file-name">No file chosen</span>
+        </div>
+        <div class="question-count">
+          <label class="label">Number of questions</label>
+          <div class="count-input">
+            <input type="number" id="question-count" min="1" value="5" />
+            <span id="count-max" class="count-max"></span>
+          </div>
+        </div>
+        <button type="submit" class="upload-btn">
+          <span class="icon">⤴</span>
+          <span>Upload & Generate</span>
+        </button>
+      </form>
+      <div class="progress-wrap">
+        <div class="progress-label" id="progress-label">Idle</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section id="quiz" class="card hidden">
+      <div class="quiz-header">
+        <div id="progress"></div>
+        <div id="quiz-id"></div>
+      </div>
+      <div id="question-container"></div>
+      <div id="feedback"></div>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

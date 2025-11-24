@@ -1,0 +1,10 @@
+{
+  "OPENAI_API_KEY": "sk-...",
+  "LLM_PROVIDER": "openrouter",
+  "OPENROUTER_API_KEY": "or-...",
+  "OPENROUTER_MODEL": "mistralai/mistral-7b-instruct:free",
+  "BACKEND_URL": "http://localhost:8000",
+  "FRONTEND_URL": "http://localhost:3000",
+  "MAX_PDF_PAGES": 5,
+  "MAX_QUESTIONS": 6
+}
