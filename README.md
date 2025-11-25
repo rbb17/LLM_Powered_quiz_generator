@@ -38,7 +38,7 @@ frontend/
    - Copy `backend/config.example.json` → `backend/config.local.json`, set `LLM_PROVIDER` to `openrouter`, `openai`, or `dummy`, and fill in keys accordingly.
    - Env vars still work and override missing fields.
    - `BACKEND_URL` / `FRONTEND_URL` in config are used for CORS and docs; adjust as needed.
-4) Run server: `uvicorn backend.main:app --reload --port 8000` From the main directory
+4) Run server: `uvicorn backend.main:app --reload --port 8000` From the main directory.
 
 ### Tests
 - Install deps (already in `backend/requirements.txt`).
