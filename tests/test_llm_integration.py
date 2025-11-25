@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from app.config import settings
-from app.llm import generate_mcqs_from_text
-from app import pdf_utils
+from backend.config import settings
+from backend.llm import generate_mcqs_from_text
+from backend import pdf_utils
 from openai import RateLimitError
 
 

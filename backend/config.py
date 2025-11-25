@@ -6,9 +6,9 @@ from pathlib import Path
 def _load_local_config() -> dict:
     """
     Load API keys and overrides from config.local.json if present.
-    File is expected at project root (same level as README.md).
+    File is expected alongside this module (backend/config.local.json).
     """
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parent
     cfg_path = root / "config.local.json"
     if not cfg_path.exists():
         return {}

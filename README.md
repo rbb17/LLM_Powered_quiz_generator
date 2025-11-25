@@ -14,27 +14,34 @@ Minimal FastAPI service that:
 
 ### Project layout
 ```
-app/
+backend/
   main.py        # FastAPI app + routes
   models.py      # Pydantic models
   storage.py     # In-memory quiz store
   pdf_utils.py   # PDF text extraction
   llm.py         # OpenAI MCQ generator (with stub fallback)
   config.py      # Basic settings (env-driven)
-requirements.txt
+  requirements.txt
+  config.example.json
+  config.local.json (gitignored)
+frontend/
+  index.html
+  app.js
+  styles.css
+  config.example.json
 ```
 
 ### Setup (local dev)
 1) Create venv (optional): `python -m venv .venv && source .venv/bin/activate`
-2) Install deps: `pip install -r requirements.txt`
+2) Install deps: `pip install -r backend/requirements.txt`
 3) Configure LLM provider and keys:
-   - Copy `config.example.json` → `config.local.json`, set `LLM_PROVIDER` to `openrouter`, `openai`, or `dummy`, and fill in keys accordingly.
+   - Copy `backend/config.example.json` → `backend/config.local.json`, set `LLM_PROVIDER` to `openrouter`, `openai`, or `dummy`, and fill in keys accordingly.
    - Env vars still work and override missing fields.
    - `BACKEND_URL` / `FRONTEND_URL` in config are used for CORS and docs; adjust as needed.
-4) Run server: `uvicorn app.main:app --reload --port 8000`
+4) Run server: `uvicorn backend.main:app --reload --port 8000` From the main directory
 
 ### Tests
-- Install deps (already in `requirements.txt`).
+- Install deps (already in `backend/requirements.txt`).
 - Live integration test (requires `OPENAI_API_KEY` or `OPENROUTER_API_KEY` and network): `pytest -m openai_live`
 
 ### Frontend (vanilla JS)
@@ -47,7 +54,7 @@ requirements.txt
 - If `OPENAI_API_KEY` is missing, the service returns a single dummy question.
 - Text extraction reads the first `MAX_PDF_PAGES` (env, default 5) and generates up to `MAX_QUESTIONS` (env, default 6).
 - CORS is wide open for local prototyping; tighten for production.
-- To use OpenRouter, set `OPENROUTER_API_KEY` (and optionally `OPENROUTER_MODEL`, `OPENROUTER_BASE_URL`, `OPENROUTER_SITE`). Config can be in `config.local.json`.
+- To use OpenRouter, set `OPENROUTER_API_KEY` (and optionally `OPENROUTER_MODEL`, `OPENROUTER_BASE_URL`, `OPENROUTER_SITE`). Config can be in `backend/config.local.json`.
 
 
 

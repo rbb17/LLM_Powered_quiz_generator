@@ -5,8 +5,8 @@ from typing import List, Tuple
 
 from openai import OpenAI, RateLimitError
 
-from .config import settings
-from .models import Question
+from backend.config import settings
+from backend.models import Question
 
 
 MCQ_SYSTEM_PROMPT = """You are a teaching assistant. Given input text, create clear multiple-choice questions.

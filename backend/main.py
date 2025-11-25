@@ -5,10 +5,10 @@ from pathlib import Path
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import pdf_utils, storage
-from .config import settings
-from .llm import generate_mcqs_from_text
-from .models import (
+from backend import pdf_utils, storage
+from backend.config import settings
+from backend.llm import generate_mcqs_from_text
+from backend.models import (
     AnswerRequest,
     AnswerResponse,
     Quiz,
