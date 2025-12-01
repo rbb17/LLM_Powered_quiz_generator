@@ -13,6 +13,12 @@ const progressEl = document.getElementById("progress");
 const questionContainer = document.getElementById("question-container");
 const feedbackEl = document.getElementById("feedback");
 
+const log = {
+  info: (...args) => console.log("[frontend]", ...args),
+  warn: (...args) => console.warn("[frontend]", ...args),
+  error: (...args) => console.error("[frontend]", ...args),
+};
+
 const quizState = {
   quizId: null,
   questions: [],
@@ -30,18 +36,21 @@ async function loadConfig() {
       const cfg = await res.json();
       if (cfg.BACKEND_URL) {
         API_BASE = cfg.BACKEND_URL.replace(/\/$/, "");
+        log.info(`Config loaded from ${file}; API_BASE=${API_BASE || "(same origin)"}`);
         return;
       }
     } catch (err) {
+      log.warn(`Failed to read ${file}:`, err);
       continue;
     }
   }
+  log.warn("No config file found; using same-origin backend.");
   API_BASE = "";
 }
 
 async function init() {
   await loadConfig();
-  console.log("Using API_BASE:", API_BASE || "(same origin)");
+  log.info("Using API_BASE:", API_BASE || "(same origin)");
   if (!API_BASE) {
     statusEl.textContent = "No backend URL configured; using same origin.";
   }
@@ -50,13 +59,14 @@ async function init() {
 }
 
 init().catch((err) => {
-  console.error("Init error:", err);
+  log.error("Init error:", err);
   statusEl.textContent = "Failed to initialize frontend.";
   setProgress(0, "Idle");
 });
 
 async function loadBackendConfig() {
   try {
+    log.info("Fetching backend config…");
     const res = await fetch(`${API_BASE || ""}/config`);
     if (!res.ok) throw new Error("Failed to load backend config.");
     const cfg = await res.json();
@@ -64,8 +74,9 @@ async function loadBackendConfig() {
     questionCountInput.max = maxQ;
     questionCountInput.value = Math.min(Number(questionCountInput.value) || maxQ, maxQ);
     countMaxEl.textContent = `Max ${maxQ}`;
+    log.info("Backend config loaded:", cfg);
   } catch (err) {
-    console.warn("Could not load backend config; using defaults.");
+    log.warn("Could not load backend config; using defaults.", err);
     const maxQ = Number(questionCountInput.value) || 6;
     questionCountInput.max = maxQ;
     countMaxEl.textContent = "";
@@ -99,6 +110,7 @@ uploadForm.addEventListener("submit", async (e) => {
     const desired = Number(questionCountInput.value) || 1;
     formData.append("num_questions", desired);
 
+    log.info("Starting upload", { file: file.name, desired });
     const data = await uploadWithProgress(formData);
     quizState.quizId = data.quiz_id;
     quizState.attempts = {};
@@ -107,7 +119,7 @@ uploadForm.addEventListener("submit", async (e) => {
     setProgress(100, "Quiz generated.");
     quizSection.classList.remove("hidden");
   } catch (err) {
-    console.error(err);
+    log.error("Upload failed:", err);
     statusEl.textContent = err.message || "Something went wrong.";
     setProgress(0, "Idle");
   }
@@ -117,7 +129,7 @@ async function uploadWithProgress(formData) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const target = `${API_BASE || ""}/upload-pdf`;
-    console.log("Uploading to:", target);
+    log.info("Uploading to:", target);
     xhr.open("POST", target);
 
     xhr.upload.onprogress = (event) => {
@@ -136,8 +148,10 @@ async function uploadWithProgress(formData) {
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
           const json = JSON.parse(xhr.responseText);
+          log.info("Upload complete", { quiz_id: json.quiz_id, status: xhr.status });
           resolve(json);
         } catch (err) {
+          log.error("Upload response parse error:", err);
           reject(new Error("Invalid server response."));
         }
       } else {
@@ -146,24 +160,37 @@ async function uploadWithProgress(formData) {
           const resp = JSON.parse(xhr.responseText);
           detail = resp.detail || detail;
         } catch (_) {}
+        log.warn("Upload returned non-2xx", xhr.status, detail);
         reject(new Error(detail));
       }
     };
-    xhr.onerror = () => reject(new Error("Network error during upload (check API_BASE and backend)."));
-    xhr.onabort = () => reject(new Error("Upload aborted."));
-    xhr.ontimeout = () => reject(new Error("Upload timed out."));
+    xhr.onerror = () => {
+      log.error("Network error during upload.");
+      reject(new Error("Network error during upload (check API_BASE and backend)."));
+    };
+    xhr.onabort = () => {
+      log.warn("Upload aborted.");
+      reject(new Error("Upload aborted."));
+    };
+    xhr.ontimeout = () => {
+      log.warn("Upload timed out.");
+      reject(new Error("Upload timed out."));
+    };
     xhr.send(formData);
   });
 }
 
 async function loadQuiz() {
+  log.info("Fetching quiz", quizState.quizId);
   const res = await fetch(`${API_BASE}/quiz/${quizState.quizId}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
+    log.warn("Failed to load quiz", quizState.quizId, err);
     throw new Error(err.detail || "Failed to load quiz.");
   }
   const data = await res.json();
   quizState.questions = data.questions;
+  log.info("Quiz loaded", { questions: quizState.questions.length, completed: data.completed });
   renderQuiz(data.completed);
 }
 
@@ -234,6 +261,7 @@ async function submitAnswer(questionId) {
   };
 
   try {
+    log.info("Submitting answer", payload);
     const res = await fetch(`${API_BASE}/quiz/${quizState.quizId}/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -241,6 +269,7 @@ async function submitAnswer(questionId) {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+      log.warn("Answer submit failed", res.status, err);
       throw new Error(err.detail || "Failed to submit answer.");
     }
     const data = await res.json();
@@ -257,7 +286,7 @@ async function submitAnswer(questionId) {
 
     await loadQuiz();
   } catch (err) {
-    console.error(err);
+    log.error("Submit answer error:", err);
     feedbackEl.textContent = err.message || "Failed to submit answer.";
   }
 }

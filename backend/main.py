@@ -1,3 +1,4 @@
+import logging
 import tempfile
 import uuid
 from pathlib import Path
@@ -18,6 +19,12 @@ from backend.models import (
     ConfigResponse,
 )
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+logger = logging.getLogger("pdf_mcq_backend")
+
 app = FastAPI(title="PDF MCQ Agent", version="0.1.0")
 
 # Allow local dev frontends. Tighten in production.
@@ -32,6 +39,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    client_host = request.client.host if request.client else "unknown"
+    logger.info("Incoming request %s %s from %s", request.method, request.url.path, client_host)
+    try:
+        response = await call_next(request)
+        logger.info("Completed request %s %s -> %s", request.method, request.url.path, response.status_code)
+        return response
+    except Exception:
+        logger.exception("Error handling request %s %s", request.method, request.url.path)
+        raise
 
 
 @app.post("/upload-pdf", response_model=UploadResponse)
