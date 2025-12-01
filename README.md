@@ -31,7 +31,7 @@ frontend/
   config.example.json
 ```
 
-### Setup (local dev)
+### Setup backend(local dev)
 1) Create venv (optional): `python -m venv .venv && source .venv/bin/activate`
 2) Install deps: `pip install -r backend/requirements.txt`
 3) Configure LLM provider and keys:
