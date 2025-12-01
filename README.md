@@ -40,6 +40,8 @@ frontend/
    - `BACKEND_URL` / `FRONTEND_URL` in config are used for CORS and docs; adjust as needed.
 4) Run server: `uvicorn backend.main:app --reload --port 8000` From the main directory.
 
+dont use `--reload` in production, use without that.
+
 ### Tests
 - Install deps (already in `backend/requirements.txt`).
 - Live integration test (requires `OPENAI_API_KEY` or `OPENROUTER_API_KEY` and network): `pytest -m openai_live`
