@@ -1,4 +1,4 @@
-let API_BASE = ""; // will be set from config (config.local.json/config.example.json)
+let API_BASE = ""; // will be set from config (config.local.json/config.json/config.example.json)
 
 const uploadForm = document.getElementById("upload-form");
 const pdfInput = document.getElementById("pdf-file");
@@ -21,7 +21,8 @@ const quizState = {
 };
 
 async function loadConfig() {
-  const candidates = ["config.local.json", "config.example.json"];
+  // Prefer local overrides, then repo config, then example defaults.
+  const candidates = ["config.local.json", "config.json"];
   for (const file of candidates) {
     try {
       const res = await fetch(file, { cache: "no-store" });

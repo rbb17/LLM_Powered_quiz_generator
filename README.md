@@ -67,3 +67,10 @@ Run pytest with stdout + skip reasons:
 ## Deployment platforms ->
 - Frontend is `netlify`
 - Backend is `render`
+
+
+Frontend URL ->
+`https://singular-fudge-2a476b.netlify.app/`
+
+Backend URL ->
+`https://llm-powered-quiz-generator.onrender.com`
