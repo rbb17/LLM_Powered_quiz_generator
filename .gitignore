@@ -2,3 +2,4 @@ backend/config.local.json
 __pycache__/
 backend/venv/
 *.pyc
+frontend/config.local.json

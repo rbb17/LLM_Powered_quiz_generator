@@ -63,3 +63,7 @@ frontend/
 
 Run pytest with stdout + skip reasons:
 - python -m pytest -m openai_live -s -rs
+
+## Deployment platforms ->
+- Frontend is `netlify`
+- Backend is `render`
